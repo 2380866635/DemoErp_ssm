@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erp.mapper.EmpMapper">
+
+<resultMap id="empVoMap" type="com.erp.vo.EmpVo">
+    <id property="id" column="id"/>
+    <result property="username" column="username"/>
+    <result property="tel" column="tel"/>
+    <result property="idCardNo" column="id_card_no"/>
+    <result property="realName" column="real_name"/>
+    <result property="gender" column="gender"/>
+    <result property="email" column="email"/>
+    <result property="address" column="address"/>
+    <result property="birthDate" column="birth_date"/>
+    <result property="deptName" column="dept_name"/>
+    <result property="roleNames" column="role_names"/>
+</resultMap>
+    <sql id="havingWheres">
+        <if test="wheres.username!=null and wheres.username!=''">
+            and e.username LIKE '%${wheres.username}%'
+        </if>
+        <if test="wheres.realName!=null and wheres.realName!=''">
+            AND e.real_name LIKE '%${wheres.realName}%'
+        </if>
+        <if test="wheres.deptName!=null and wheres.deptName!=''">
+            AND d.`name` like '%${wheres.deptName}%'
+        </if>
+        <if test="wheres.roleNames!=null and wheres.roleNames!=''">
+            AND role_names LIKE '%${wheres.roleNames}%'
+        </if>
+    </sql>
+
+    <sql id="selectResult">
+       SELECT e.*,d.`name` dept_name,GROUP_CONCAT(r.`name` SEPARATOR ',') role_names
+        FROM emp e
+        LEFT JOIN dept d ON e.dept_id=d.id
+        LEFT JOIN emp_role er ON er.emp_id=e.id
+        LEFT JOIN role r ON er.role_id=r.id
+        GROUP BY e.id
+    </sql>
+    <select id="page" resultMap="empVoMap">
+        <include refid="selectResult"/>
+        HAVING  1=1
+        <include refid="havingWheres"/>
+        ORDER BY e.id desc
+        limit #{start},#{pageSize}
+    </select>
+    <select id="count" resultType="int">
+        select COUNT(*) from(
+        <include refid="selectResult"/>
+        HAVING  1=1
+        <include refid="havingWheres"/>
+        ) r
+    </select>
+    <delete id="remove">
+        delete from emp where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="findById" resultMap="empVoMap">
+        <include refid="selectResult"/>
+        having e.id=#{id}
+    </select>
+    <insert id="add" >
+       INSERT INTO `erp_ssm`.`emp`
+       (`id`,`username`, `password`, `tel`, `id_card_no`, `real_name`, `gender`, `email`, `address`, `birthdate`, `dept_id`)
+       VALUES
+       (null,#{emp.username},#{emp.password},#{emp.tel},#{emp.idCardNo},#{emp.realName},#{emp.gender},#{emp.email},#{emp.address},#{emp.birthDate},#{emp.deptId})
+    </insert>
+    <update id="update">
+        update emp set  tel=#{emp.tel},id_card_no=#{emp.idCardNo},real_name=#{emp.realName},
+        gender=#{emp.gender},email=#{emp.email},address=#{emp.address},birthdate=#{emp.birthDate},dept_id=#{emp.deptId}
+        where id=#{emp.id}
+    </update>
+    <select id="getKey" resultType="int">
+        select LAST_INSERT_ID()
+    </select>
+    <select id="login" resultType="com.erp.pojo.Emp">
+        select
+        emp.*,`id_card_no`,`username`, `password`, `tel`, `real_name`, `gender`, `birthdate`, `dept_id`
+         from emp where username=#{username} and password=#{password};
+    </select>
+
+</mapper>

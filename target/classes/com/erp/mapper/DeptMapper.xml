@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erp.mapper.DeptMapper">
+	<!--按照分页 查询所有部门信息-->
+    <select id="page" resultType="com.erp.pojo.Dept">
+		select * from `dept` limit #{startNum},#{pageSize}
+	</select>
+	<!--查询所有员工的条数-->
+	<select id="count" resultType="int">
+		select count(*) from `dept`
+	</select>
+	<!--增加部门信息
+	void  add(@Param("dept") Dept dept);-->
+	<insert id="add" >
+		insert into dept (name,tel) values (#{dept.name},#{dept.tel})
+	</insert>
+<!--
+	Dept findById(@Param("id") Integer id);-->
+	<select id="findById" resultType="com.erp.pojo.Dept">
+		select *from dept where id=#{id}
+	</select>
+	<!--
+	void update(@Param("dept") Dept dept);-->
+	<update id="update" >
+		update dept set `name`=#{dept.name},tel=#{dept.tel} where id=#{dept.id}
+	</update>
+	<!--
+	void remove(@Param("ids") Integer[] ids);
+-->
+	<delete id="remove">
+		delete from dept where id in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	<select id="findAll" resultType="com.erp.pojo.Dept">
+		select *from dept
+	</select>
+
+</mapper>

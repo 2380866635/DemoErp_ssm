@@ -1,0 +1,338 @@
+<div class="easyui-layout" data-options="fit:true">
+    <!-- Begin of toolbar -->
+    <div id="wu-toolbar-goods">
+        <div class="wu-toolbar-button">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove()" plain="true">删除</a>
+<!--            <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="cancel()" plain="true">取消</a>-->
+            <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+          <!--
+           <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openAdd()" plain="true">打印</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-help" onclick="openEdit()" plain="true">帮助</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-undo" onclick="remove()" plain="true">撤销</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-redo" onclick="cancel()" plain="true">重做</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-sum" onclick="reload()" plain="true">总计</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-back" onclick="reload()" plain="true">返回</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-tip" onclick="reload()" plain="true">提示</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-save" onclick="reload()" plain="true">保存</a>
+           <a href="#" class="easyui-linkbutton" iconCls="icon-cut" onclick="reload()" plain="true">剪切</a>
+            -->
+        </div>
+        <div class="wu-toolbar-search">
+            <label>商品名称：</label><input  id="name" class="wu-text" style="width:100px">
+            <label>产地：</label><input id="origin" class="wu-text" style="width:100px">
+            <label>品牌：</label><input id="producer" class="wu-text" style="width:100px">
+           <!-- <label>品牌：</label><input type="text" id="deptName" class="easyui-combobox" style="width:100px">
+                <script>
+                    $(function () {
+                        $('#deptName').combobox({
+                            url:'dept/findAll',
+                            valueField:'id',
+                            textField:'name'
+                        });
+                    })
+                </script>
+            <label>价格：</label><input  id="roleNames"  class="easyui-combobox"
+            data-options="valueField:'id',textField:'name',url:'role/findAll',prompt:'请选择'"style="width:100px">
+           --> <a href="#" class="easyui-linkbutton" iconCls="icon-search"id="goodsSearch" >开始检索</a>
+        <!--点击事件-->
+            <script>
+                $(function () {
+
+                   $("#goodsSearch").click(function () {
+
+                        $("#wu-datagrid-goods").datagrid("load",{
+                            pageNum:$("#wu-datagrid-goods").datagrid("options").pageNumber,
+                            pageSize:$("#wu-datagrid-goods").datagrid("options").pageSize,
+                            name:$("#name").val(),
+                            origin:$("#origin").val(),
+                            producer:$("#producer").val()
+                           // roleNames:$("#roleNames").combobox('getText')
+                        });
+                   });
+                });
+            </script>
+        </div>
+    </div>
+    <!-- End of toolbar -->
+    <table id="wu-datagrid-goods" class="easyui-datagrid" toolbar="#wu-toolbar-goods"></table>
+</div>
+<!-- Begin of easyui-dialog -->
+<div id="wu-dialog-goods" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:400px; padding:10px;">
+	<form id="wu-form-goods" method="post">
+        <input type="hidden" name="uuid" class="wu-text">
+        <table>
+            <tr>
+                <td width="60" align="right">商品名称:</td>
+                <td><input type="text" name="name" class="wu-text" /></td>
+            </tr>
+
+            <tr>
+                <td align="right">产地:</td>
+                <td><input type="text" name="origin" class="wu-text" /></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">品牌:</td>
+                <td><input type="text" name="producer" class="wu-text" /></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">单位:</td>
+                <td><input type="text" name="unit" class="wu-text"  /></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">进价：</td>
+                <td><input type="text" name="inPrice" class="wu-text" /></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">售价:</td>
+                <td><input type="text" name="outPrice" class="wu-text" /></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">商品类别:</td>
+                <td>
+                    <input id="deptSelect" name="goodsTypeId" class="easyui-combobox"
+                           data-options="valueField:'uuid',textField:'name',url:'goods/rightFindAll'" value="请选择"/>
+                </td>
+
+            </tr>
+        </table>
+    </form>
+        <!--类别的信息回显-->
+   <!-- <script>
+        $(function(){
+            $.ajax({
+                url:'goods/rightFindAll',
+                success:function (data) {
+                    $(data).each(function () {
+                        $('#ck_roles').html(
+                            $('#ck_roles').html()+"<input type='checkbox' name='roleIds' value='"+this.id+"'>"
+                            +"<span>"+this.name+"</span><br>"
+                        )
+                    });
+                }
+            });
+        })
+    </script>-->
+</div>
+<!-- End of easyui-dialog -->
+<script type="text/javascript">
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#wu-form-goods').form('submit', {
+			url:'goods/add',
+			success:function(data){
+				if(data=='true'){
+					$.messager.alert('信息提示','提交成功！','info',function () {
+                        //当窗口提交后 触动更新表格
+                        $('#wu-datagrid-goods').datagrid('reload');
+                    });
+                    $('#wu-dialog-goods').dialog('close');
+                }
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		$('#wu-form-goods').form('submit', {
+			url:'goods/update',
+			success:function(data){//相应数据
+                console.log("修改的"+data);
+                if(data=='true'){
+					$.messager.alert('信息提示','提交成功！','info',function () {
+                        $('#wu-datagrid-goods').datagrid('reload');
+                    });
+					$('#wu-dialog-goods').dialog('close');
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+
+	/**
+	* Name 删除记录
+	*/
+	function remove(){
+        var items = $('#wu-datagrid-goods').datagrid('getSelections');
+        if (items.length==0){
+         return;
+        }
+        $.messager.confirm('信息提示','确定要删除该记录？', function(result){
+			if(result){
+				var uuid = [];
+				$(items).each(function(){
+					uuid.push(this.uuid);//获取数组的每一项item吧选中的数据添加到里面
+				});
+				//alert(ids);return;
+				$.ajax({
+					url:'goods/remove',
+                    traditional:true,
+					data:{uuid:uuid},
+					success:function(data){
+						if(data){
+							$.messager.alert('信息提示','删除成功！','info',function () {
+                                $('#wu-datagrid-goods').datagrid('reload');
+                            });
+						}
+						else
+						{
+							$.messager.alert('信息提示','删除失败！','info');
+						}
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	* Name 打开添加窗口
+	*/
+	function openAdd(){
+		$('#wu-form-goods').form('clear');
+		$('#wu-dialog-goods').dialog({
+			//是否关闭窗口  faluse关闭
+            closed: false,
+            //模态 当展示当前窗口时 只能操作当前窗口内容
+			modal:true,
+            //窗口标题
+            title: "添加信息",
+            //数组  按钮 每一个按钮有一个json对象定义
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#wu-dialog-goods').dialog('close');
+                }
+            }]
+        });
+	}
+
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#wu-form-goods').form('clear');
+		// getSeconds 放回所有选中的行
+		var items = $('#wu-datagrid-goods').datagrid('getSelections');
+		//alert(item.productid);return;
+        if(items.length==0){
+            $.messager.alert('信息提示','请选择要修改的商品信息！','warning');
+            return;
+        }else if(items.length>1){
+            $.messager.alert('信息提示','修改的商品信息之能为一条！','warning');
+            return;
+        }
+       // $$('#wu-dialog-goods').from(`load`,items[0]);
+        $.ajax({
+            url:'goods/findById',
+            data:{uuid:items[0].uuid},
+            success:function(data){
+                if(data){
+                    //绑定值
+                    $('#wu-form-goods').form('load',data)
+                    //data就是会显得数据
+                }
+                else{
+                    $('#wu-dialog-goods').dialog('close');
+                    //关闭模态
+                }
+            }
+        });
+		$('#wu-dialog-goods').dialog({
+			closed: false,
+			modal:true,
+            title: "修改信息",
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: edit
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#wu-dialog-goods').dialog('close');
+                }
+            }]
+        });
+	}
+
+	/**
+	* Name 分页过滤器
+	*/
+	function pagerFilter(data){
+		var dg = $(this);  //当前表格
+		var opts = dg.datagrid('options');//当前table的属性
+		var pager = dg.datagrid('getPager'); //获得当前表格的分页对象
+		pager.pagination({ //当页码改变时调用此事件  pageNum新的页码  pageSize每页显示条数
+			onSelectPage:function(pageNum, pageSize){
+				opts.pageNumber = pageNum;
+				opts.pageSize = pageSize;
+                dg.datagrid('load', {
+                   pageSize: pageSize,
+                    pageNum:pageNum,
+                    name:$("#name").val(),
+                    origin:$("#origin").val(),
+                    producer:$("#producer").val()
+                });
+				pager.pagination('refresh',{pageNumber:pageNum,pageSize:pageSize});
+				//刷新当前页  pageSize  刷新的当前页
+             //   dg.datagrid('loadData',data);
+
+			}
+		});
+		return data;
+	}
+
+
+
+
+	/**
+	* Name 载入数据
+	*/
+	$('#wu-datagrid-goods').datagrid({
+		url:'goods/page',
+		loadFilter:pagerFilter,		
+		//rownumbers:true,
+		singleSelect:false,
+		pageSize:2,
+		pagination:true,
+        pageList:[1,2,3,4,5],
+		//multiSort:true,
+		fitColumns:true,
+		fit:true,
+		columns:[[
+			{ checkbox:true},
+			{ field:'uuid',title:'商品编号',width:100,sortable:true},
+			{ field:'name',title:'商品名称',width:180,sortable:true},
+			{ field:'origin',title:'产地',width:180,sortable:true},
+			{ field:'producer',title:'品牌',width:100,sortable:true},
+			{ field:'unit',title:'单位',width:100},
+			{ field:'inPrice',title:'进价',width:100},
+			{ field:'outPrice',title:'售价',width:100},
+			{ field:'goodsTypeId',title:'商品类别',width:100,
+                 formatter : function(value,row,index){
+                     if(value=='1'){return '电器'}
+                     else if(value=='2'){
+                      return '服装'
+                         }
+                 },
+            }
+        ]]
+	});
+</script>

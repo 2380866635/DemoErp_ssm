@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erp.mapper.RoleMapper">
+    <select id="findAll" resultType="com.erp.pojo.Role">
+        select *from role
+    </select>
+
+    <select id="page" resultType="com.erp.pojo.Role">
+        SELECT *FROM role where 1=1
+         <if test="role.id!=null and role.id!=''">
+             and id=#{role.id}
+         </if>
+        <if test="role.name!=null and role.name!=''">
+            and `name` LIKE '%${role.name}%'
+        </if>
+         LIMIT #{start},#{pageSize}
+    </select>
+<!--
+    void remove(@Param("ids") int [] ids);
+-->
+    <delete id="remove">
+        delete from role where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+<!--
+    void update(@Param("role") Role role);
+-->
+    <update id="update">
+        update role set `name`=#{role.name} where id=#{role.id}
+    </update>
+
+<!--
+    Role findById(@Param("id") int id);
+-->
+    <select id="findById" resultType="com.erp.pojo.Role">
+        select *from role where id=#{id}
+    </select>
+<!--
+    void add(@Param("role") Role role);
+-->
+    <insert id="add">
+        INSERT INTO `erp_ssm`.`role` (`id`, `name`) VALUES (null,#{role.name});
+    </insert>
+    <!--
+        int count(@Param("role") Role role);
+    -->
+    <select id="count" resultType="int">
+        SELECT count(*) FROM role where 1=1
+        <if test="role.id!=null and role.id!=''">
+            and id=#{role.id}
+        </if>
+        <if test="role.name!=null and role.name!=''">
+            and `name` LIKE '%${role.name}%'
+        </if>
+    </select>
+    <select id="findpermissionIdsByRoleId" resultType="int">
+        SELECT premission_id FROM role_premission
+        WHERE role_id=#{roleId}
+    </select>
+    <delete id="removePerm">
+        DELETE FROM role_premission WHERE role_id=#{roleId}
+    </delete>
+    <insert id="updatePerm">
+        INSERT INTO `role_premission` (`role_id`, `premission_id`)
+        VALUES
+        <foreach collection="permIds" item="permId" separator=",">
+      (#{roleId}, #{permId})
+        </foreach>
+    </insert>
+</mapper>
